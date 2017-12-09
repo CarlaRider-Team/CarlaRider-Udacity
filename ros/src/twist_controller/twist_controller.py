@@ -6,10 +6,6 @@ import math
 
 GAS_DENSITY = 2.858
 
-MAX_BRAKE_TORQUE= 20000
-MAX_ACCEL_TORQUE= 100.0
-MAX_ACCELTORQUE_PERCENTAGE = 1.0
-
 # Gains - can be tuned!
 KP = 0.5
 KI = 0.05
