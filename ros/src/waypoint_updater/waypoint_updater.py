@@ -86,6 +86,14 @@ class WaypointUpdater(object):
                 self.closest_waypoint = self.get_closest_waypoint(self.car_position, self.car_yaw, self.waypoints)
                 self.go_waypoints(self.closest_waypoint, self.waypoints)
                 self.publish()
+            else:
+                if self.car_position == None:
+                    rospy.logwarn("[waypoint_updater.py] /current_pose not received")
+                if self.waypoints == None:
+                    rospy.logwarn("[waypoint_updater.py] /base_waypoints not received")
+                if self.tl_idx == None:
+                    rospy.logwarn("[waypoint_updater.py] /traffic_waypoint not received")
+                                        
 
     def publish(self):
         final_waypoints_msg = Lane()
