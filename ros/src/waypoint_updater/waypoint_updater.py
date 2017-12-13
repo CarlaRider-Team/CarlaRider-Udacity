@@ -53,7 +53,7 @@ class WaypointUpdater(object):
         self.car_position = None
         self.car_yaw = None
         # traffic_cb
-        self.tl_state = None
+        self.tl_idx = None
         self.tl_state = None
         # self.base_waypoints = Lane()
         # self.current_pose = PoseStamped()
@@ -61,10 +61,12 @@ class WaypointUpdater(object):
         # self.current_pose_cb = False
         # self.wp_num = 0
         # self.wp_front = 0
+        self.state = None
         self.cruise_speed = None
         self.current_speed = None
         self.acceleration = None
         self.deceleration = None
+        self.dist_until_tl
         
         # publishing loop
         # self.pub_waypoints()
@@ -83,8 +85,13 @@ class WaypointUpdater(object):
 
         while not rospy.is_shutdown():
             if (self.car_position != None and self.waypoints != None and self.tl_state != None and self.car_curr_vel != None):
+                self.safe_distance = (self.current_speed**2) / (2 * self.deceleration * 0.1)
                 self.closest_waypoint = self.get_closest_waypoint(self.car_position, self.car_yaw, self.waypoints)
-                self.go_waypoints(self.closest_waypoint, self.waypoints)
+                # need closest waypoint before trying to get the distance until tf
+                if tl_idx != None:
+                    self.dist_until_tl = self.distance(self.waypoints, self.closest_waypoint, self.tl_idx)
+                self.car_state = self.determine_state(self.tl_idx, self.tl_state, self.closest_waypoint, self.waypoints)
+                self.get_final_waypoints(self.closest_waypoint, self.waypoints, self.car_state, self.tl_index)
                 self.publish()
             else:
                 if self.car_position == None:
@@ -93,7 +100,19 @@ class WaypointUpdater(object):
                     rospy.logwarn("[waypoint_updater.py] /base_waypoints not received")
                 if self.tl_idx == None:
                     rospy.logwarn("[waypoint_updater.py] /traffic_waypoint not received")
+            rate.sleep()
                                         
+
+    def get_final_waypoints(closest_waypoint, waypoints, car_state, tl_idx):
+        self.final_waypoints = []
+        rospy.loginfo("car state: %s ", car_state)
+
+        if (car_state == "GO"):
+            self.go_waypoints(closest_waypoint, waypoints)
+        elif (car_state == "STOP"):
+            self.stop_waypoints(closest_waypoint, waypoints)
+        elif (car_state == "SLOW")
+            self.slow_waypoints(closest_waypoint, waypoints, tl_index)
 
     def publish(self):
         final_waypoints_msg = Lane()
@@ -128,6 +147,35 @@ class WaypointUpdater(object):
                 closest_waypoint -= 1
         return closest_waypoint
 
+    def determine_state(self, tl_index, tl_state, closest_waypoint, waypoints):
+        dist = self.dist_until_tl
+        stop = False # self.check_stop(tl_index, tl_state, closest_waypoint, dist)
+        slow = False # self.check_slow(tl_state, dist)
+        go = self.check_go(tl_index, tl_state, closest_waypoint, dist)
+
+        rospy.loginfo("determine state: %s | %s | %s", tl_index, tl_state, closest_waypoint)
+        # see ros/src/styx_msgs/msg/TrafficLight.msg
+        if tl_index != None and tl_state != "UNKNOWN":
+            if (stop):
+                state = "STOP"
+                return state
+            elif (slow):
+                state = "SLOW"
+                return state
+            elif (go):
+                state = "GO"
+                return state
+        else:
+            if tl_index != -1:
+                dist = self.dist_until_tl
+                if dist < self.safe_distance:
+                    state = "SLOW"
+                else:
+                    state = "GO"
+            else:
+                state = "GO"
+        return state
+    
     def map_distance(self, x1, y1, x2, y2):
         return math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
     
@@ -150,8 +198,8 @@ class WaypointUpdater(object):
         rospy.loginfo("waypoint msg receive with %d length.... ", len(msg.waypoints))
         for waypoint in msg.waypoints:
             self.waypoints.append(waypoint)
-        self.base_waypoints_sub.unregister()
-        rospy.loginfo("ungregistereing from /base_waypoints topics")
+        # self.base_waypoints_sub.unregister()
+        # rospy.loginfo("ungregistereing from /base_waypoints topics")
 
     def traffic_cb(self, msg):
         state = msg.state
@@ -164,7 +212,7 @@ class WaypointUpdater(object):
         elif state == 2:
             self.tl_state = "GREEN"
         elif state == 4:
-            self.tl_state = "NO"
+            self.tl_state = "UNKNOWN"
         rospy.loginfo("traffic_cb tl_idx: %d | tl_state: %s", self.tl_idx, self.tl_state)
 
     def obstacle_cb(self, msg):
@@ -188,12 +236,12 @@ class WaypointUpdater(object):
     def go_waypoints(self, closest_waypoint, waypoints):
         acc_factor = 0.2
         s = self.current_speed
-        e = closest_waypoint + LOOKAHEAD_WPS
+        e = self.end_waypoint(closest_waypoint)
         if e > len(waypoints) - 1:
             e = len(waypoints) - 1
         a = acc_factor * self.acceleration
 
-        for idx in range(closest_waypoint, end):
+        for idx in range(closest_waypoint, e):
             distance = self.distance(waypoints, closest_waypoint, idx +1)
             velocity = math.sqrt(s**2 + 2 + a + distance)
             if velocity > self.cruise_speed:
@@ -201,9 +249,43 @@ class WaypointUpdater(object):
             self.set_waypoint_velocity(waypoints, idx, velocity)
             waypoint = waypoints[idx]
             self.final_waypoints.append(waypoint)
+
+    def stop_waypoints(self, closest_waypoint, waypoints):
+        e = self.end_waypoint(closest_waypoint)
+        if e > len(waypoints) - 1:
+           e = len(waypoints) - 1
+
+        for idx in range(closest_waypoint, e):
+            velocity = 0.0
+            self.set_waypoint_velocity(waypoints, idx, velocity)
+            self.final_waypoints.append(waypoints[idx])
+    
+    def slow_waypoints(self, closest_waypoint, waypoints, tl_index):
+        # https://physics.stackexchange.com/questions/3818/stopping-distance-frictionless
+        slow_deceleration = (self.current_speed ** 2)/(2 * self.dist_until_tl)
+        if slow_deceleration > self.decel_limit:
+            slow_deceleration = self.decel_limit
+        e = self.end_waypoint(closest_waypoint)
+
+        for idx in range(closest_waypoint, e):
+            distance = self.distance(waypoints, closest_waypoint, idx + 1)
+            if (idx < tl_index):
+                # slow down
+                vel2 = self.current_speed ** 2 - 2 * slow_deceleration * distance
+                if slow_to < 0.1:
+                    slow_to = 0.0
+                vel = math.sqrt(vel2)
+                self.set_waypoint_velocity(waypoints, idx, vel)
+                self.final_waypoints(waypoints[idx])
+            else:
+                # STOOOOOOOOOP!
+                vel = 0.0
+                self.set_waypoint_velocity(waypoints, idx, vel)
+                self.final_waypoints(waypoints[idx])                
+
+    def end_waypoint(self, closest_waypoint)
+        return closest_waypoint + LOOKAHEAD_WPS
         
-
-
 
 if __name__ == '__main__':
     try:
