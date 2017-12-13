@@ -307,22 +307,20 @@ class WaypointUpdater(object):
 
     def check_slow(tl_index, tl_state, closest_waypoint, dist):
         notYellowLight = (tl_state != "UNKNOWN" and tl_state != "RED" and tl_state != "GREEN")
-        if (notYellowLight and dist > 5.00 and dist < safe_distance) {
+        if (notYellowLight and dist > 5.00 and dist < safe_distance):
             return True
-        } elif (notYellowLight and dist < 4 * 3.00) {
+        elif (notYellowLight and dist < 4 * 3.00):
             return True
-        }
         
         return False
 
     def check_stop(self, tl_index, tl_state, closest_waypoint, dist):
         _dist = 3.00
         redYellow = tl_state == "RED" or tl_state == "YELLOW"
-        if (redYellow and dist < _dist) {
+        if (redYellow and dist < _dist):
             return True
-        } elif (redYellow and tl_idx == closest_waypoint and dist < _dist) {
+        elif (redYellow and tl_idx == closest_waypoint and dist < _dist):
             return True
-        }
 
         return False
 
