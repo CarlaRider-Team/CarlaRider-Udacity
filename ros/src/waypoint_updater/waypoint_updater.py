@@ -66,7 +66,15 @@ class WaypointUpdater(object):
         self.current_speed = None
         self.acceleration = None
         self.deceleration = None
-        self.dist_until_tl
+        '''
+        Traceback (most recent call last):
+            File "/capstone/ros/src/waypoint_updater/waypoint_updater.py", line 292, in <module>
+                WaypointUpdater()
+            File "/capstone/ros/src/waypoint_updater/waypoint_updater.py", line 69, in __init__
+                self.dist_until_tl
+            AttributeError: 'WaypointUpdater' object has no attribute 'dist_until_tl'
+        '''
+        self.dist_until_tl = None
         
         # publishing loop
         # self.pub_waypoints()
@@ -111,7 +119,7 @@ class WaypointUpdater(object):
             self.go_waypoints(closest_waypoint, waypoints)
         elif (car_state == "STOP"):
             self.stop_waypoints(closest_waypoint, waypoints)
-        elif (car_state == "SLOW")
+        elif (car_state == "SLOW"):
             self.slow_waypoints(closest_waypoint, waypoints, tl_index)
 
     def publish(self):
@@ -283,7 +291,7 @@ class WaypointUpdater(object):
                 self.set_waypoint_velocity(waypoints, idx, vel)
                 self.final_waypoints(waypoints[idx])                
 
-    def end_waypoint(self, closest_waypoint)
+    def end_waypoint(self, closest_waypoint):
         return closest_waypoint + LOOKAHEAD_WPS
         
 
