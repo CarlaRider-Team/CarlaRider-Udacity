@@ -160,6 +160,8 @@ class WaypointUpdater(object):
         stop = False # self.check_stop(tl_index, tl_state, closest_waypoint, dist)
         slow = False # self.check_slow(tl_state, dist)
         go = self.check_go(tl_index, tl_state, closest_waypoint, dist)
+        slow = self.check_slow(tl_index, tl_state, closest_waypoint, dist)
+        stop = self.check_stop(tl_index, tl_state, closest_waypoint, dist)
 
         rospy.loginfo("determine state: %s | %s | %s", tl_index, tl_state, closest_waypoint)
         # see ros/src/styx_msgs/msg/TrafficLight.msg
@@ -293,7 +295,37 @@ class WaypointUpdater(object):
 
     def end_waypoint(self, closest_waypoint):
         return closest_waypoint + LOOKAHEAD_WPS
+
+    def check_go(self, tl_index, tl_state, closest_waypoint, dist):
+        check1 = (tl_state == "GREEN" and dist < 5.00)
+        check2 = (tl_index < closest_waypoint)
+        check3 = (dist > self.safe_distance)
         
+        if check1 or check2 or check3:
+            return True
+        return False
+
+    def check_slow(tl_index, tl_state, closest_waypoint, dist):
+        notYellowLight = (tl_state != "UNKNOWN" and tl_state != "RED" and tl_state != "GREEN")
+        if (notYellowLight and dist > 5.00 and dist < safe_distance) {
+            return True
+        } elif (notYellowLight and dist < 4 * 3.00) {
+            return True
+        }
+        
+        return False
+
+    def check_stop(self, tl_index, tl_state, closest_waypoint, dist):
+        _dist = 3.00
+        redYellow = tl_state == "RED" or tl_state == "YELLOW"
+        if (redYellow and dist < _dist) {
+            return True
+        } elif (redYellow and tl_idx == closest_waypoint and dist < _dist) {
+            return True
+        }
+
+        return False
+
 
 if __name__ == '__main__':
     try:
