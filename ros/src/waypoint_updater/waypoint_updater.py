@@ -34,8 +34,6 @@ class WaypointUpdater(object):
         self.LOOKAHEAD_WPS = 200
 
         self.waypoints_base = []
-        self.waypoints_final = []
-
         self.dist_max = 0.0  # max dist from the closest waypoint
 
         rospy.spin()
