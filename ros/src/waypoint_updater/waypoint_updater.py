@@ -40,12 +40,13 @@ class WaypointUpdater(object):
 
     def publish_waypoints(self, waypoints):
         lane = Lane()
+        lane.frame_id = '/World'
         lane.header.stamp = rospy.Time(0)
         lane.waypoints = waypoints
         self.pub_final_waypoints.publish(lane)
 
     def get_nearest_front(self, current_pose, waypoints):
-        dist_square_min = 99999
+        dist_square_min = float("inf")
         index_min = 0
         for index in range(len(waypoints)):
             dist_square_cur = (waypoints[index].pose.pose.position.x - current_pose.position.x) ** 2 \
