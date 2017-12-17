@@ -40,7 +40,7 @@ class WaypointUpdater(object):
 
     def publish_waypoints(self, waypoints):
         lane = Lane()
-        lane.frame_id = '/World'
+        lane.header.frame_id = '/World'
         lane.header.stamp = rospy.Time(0)
         lane.waypoints = waypoints
         self.pub_final_waypoints.publish(lane)
