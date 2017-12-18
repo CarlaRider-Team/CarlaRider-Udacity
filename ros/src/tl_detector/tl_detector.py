@@ -182,16 +182,22 @@ class TLDetector(object):
             if curr_light_wp >= car_position: #checking that light_wp is ahead of car_wp
                 if closest_light_wp is None:    #if this is the first light
                     closest_light_wp = curr_light_wp
-                    light = curr_light_pose
+                    light_pose = curr_light_pose
                 elif curr_light_wp < closest_light_wp:
                     closest_light_wp = curr_light_wp
-                    light = curr_light_pose
+                    light_pose = curr_light_pose
 
-	#set variable to return after for loop (light is already set)
+
+	#set variables to after for loop
 	light_wp = closest_light_wp
+	###!!! Not sure if this is how to create the traffic light object for the classifier!!!
+	light = TrafficLight()
+        light.pose = PoseStamped()
+        light.pose.pose.position.x = light_pose.position.x
+        light.pose.pose.position.y = light_pose.position.y
 
 	rospy.loginfo("process_traffic_lights: Closest light position waypoint index: %s", light_wp)
-
+	#rospy.loginfo("process_traffic_lights: Closest light object is: %s", light)
 
 
         if light:
