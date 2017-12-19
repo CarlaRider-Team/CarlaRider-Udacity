@@ -10,7 +10,7 @@ from light_classification.tl_classifier import TLClassifier
 import tf
 import cv2
 import yaml
-
+import math
 STATE_COUNT_THRESHOLD = 3
 
 class TLDetector(object):
@@ -21,6 +21,7 @@ class TLDetector(object):
         self.waypoints = None
         self.camera_image = None
         self.lights = []
+        self.wps1 = None
 
         sub1 = rospy.Subscriber('/current_pose', PoseStamped, self.pose_cb)
         sub2 = rospy.Subscriber('/base_waypoints', Lane, self.waypoints_cb)
@@ -101,7 +102,28 @@ class TLDetector(object):
 
         """
         #TODO implement
-        return 0
+
+        closest_wp_dist = 99999999.9
+        closest_wp_index = None
+
+        # check needed because waypoints are only transmitted once at the beginning
+        if self.waypoints is not None:
+            wps = self.waypoints.waypoints
+            self.wps1 = wps
+        
+        n = len(self.wps1)
+        for i in range(n):
+            wpsi = self.wps1[i].pose.pose.position
+            wp_dx = wpsi.x - pose.position.x
+            wp_dy = wpsi.y - pose.position.y
+            wp_dz = wpsi.z - pose.position.z
+            wp_dist = math.sqrt(wp_dx**2+wp_dy**2+wp_dz**2)
+            if wp_dist < closest_wp_dist:
+                closest_wp_index = i
+                closest_wp_dist = wp_dist
+        #print('closest_wp_index=',closest_wp_index,' closest_wp_dist=',closest_wp_dist)
+
+        return closest_wp_index
 
     def get_light_state(self, light):
         """Determines the current color of the traffic light
