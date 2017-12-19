@@ -173,8 +173,8 @@ class TLDetector(object):
 
         #TODO find the closest visible traffic light (if one exists)
 
-	#Iterate through all the stop line positions and find the nearest forward stop line (light)
-	for curr_light_position in stop_line_positions:
+    	#Iterate through all the stop line positions and find the nearest forward stop line (light)
+    	for curr_light_position in stop_line_positions:
 
             curr_light_pose = self.make_pose(curr_light_position[0], curr_light_position[1])
             curr_light_wp = self.get_closest_waypoint(curr_light_pose)
@@ -186,18 +186,17 @@ class TLDetector(object):
                 elif curr_light_wp < closest_light_wp:
                     closest_light_wp = curr_light_wp
                     light_pose = curr_light_pose
+                    
+    	#set variables to after for loop
+    	light_wp = closest_light_wp
+    	###!!! Not sure if this is how to create the traffic light object for the classifier!!!
+    	light = TrafficLight()
+            light.pose = PoseStamped()
+            light.pose.pose.position.x = light_pose.position.x
+            light.pose.pose.position.y = light_pose.position.y
 
-
-	#set variables to after for loop
-	light_wp = closest_light_wp
-	###!!! Not sure if this is how to create the traffic light object for the classifier!!!
-	light = TrafficLight()
-        light.pose = PoseStamped()
-        light.pose.pose.position.x = light_pose.position.x
-        light.pose.pose.position.y = light_pose.position.y
-
-	rospy.loginfo("process_traffic_lights: Closest light position waypoint index: %s", light_wp)
-	#rospy.loginfo("process_traffic_lights: Closest light object is: %s", light)
+    	rospy.loginfo("process_traffic_lights: Closest light position waypoint index: %s", light_wp)
+    	#rospy.loginfo("process_traffic_lights: Closest light object is: %s", light)
 
 
         if light:
