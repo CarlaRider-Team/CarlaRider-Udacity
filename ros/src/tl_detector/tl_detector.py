@@ -91,6 +91,13 @@ class TLDetector(object):
             self.upcoming_red_light_pub.publish(Int32(self.last_wp))
         self.state_count += 1
 
+
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
+
+        # TODO THIS SHOULDN'T BE HERE
+        self.light_classifier.get_classification(cv_image)
+
+
     def get_closest_waypoint(self, pose):
         """Identifies the closest path waypoint to the given position
             https://en.wikipedia.org/wiki/Closest_pair_of_points_problem
@@ -139,7 +146,7 @@ class TLDetector(object):
             self.prev_light_loc = None
             return False
 
-        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "bgr8")
+        cv_image = self.bridge.imgmsg_to_cv2(self.camera_image, "rgb8")
 
         #Get classification
         return self.light_classifier.get_classification(cv_image)
@@ -164,6 +171,7 @@ class TLDetector(object):
         """
         light = None
         closest_light_wp = None
+
         
         if (self.waypoints is None):
             return -1, TrafficLight.UNKNOWN
