@@ -26,8 +26,10 @@ class TLClassifier(object):
         self.detection_graph = tf.Graph()
         with self.detection_graph.as_default():
             od_graph_def = tf.GraphDef()
+            import os
+            path1 = (os.getcwd())
             with tf.gfile.GFile(
-                    '/home/mfc/projects/udacity/CarlaRider-Udacity/ros/src/tl_detector/light_classification/trained_models/sim/frozen_inference_graph.pb',
+                            path1 + '/light_classification/trained_models/sim/frozen_inference_graph.pb',
                     'rb') as fid:
                 serialized_graph = fid.read()
                 od_graph_def.ParseFromString(serialized_graph)
@@ -36,14 +38,19 @@ class TLClassifier(object):
             self.session = tf.Session(graph=self.detection_graph)
 
         # Definite input and output Tensors for detection_graph
-        self.image_tensor = self.detection_graph.get_tensor_by_name('image_tensor:0')
+        self.image_tensor = self.detection_graph.get_tensor_by_name(
+            'image_tensor:0')
         # Each box represents a part of the image where a particular object was detected.
-        self.detection_boxes = self.detection_graph.get_tensor_by_name('detection_boxes:0')
+        self.detection_boxes = self.detection_graph.get_tensor_by_name(
+            'detection_boxes:0')
         # Each score represent how level of confidence for each of the objects.
         # Score is shown on the result image, together with the class label.
-        self.detection_scores = self.detection_graph.get_tensor_by_name('detection_scores:0')
-        self.detection_classes = self.detection_graph.get_tensor_by_name('detection_classes:0')
-        self.num_detections = self.detection_graph.get_tensor_by_name('num_detections:0')
+        self.detection_scores = self.detection_graph.get_tensor_by_name(
+            'detection_scores:0')
+        self.detection_classes = self.detection_graph.get_tensor_by_name(
+            'detection_classes:0')
+        self.num_detections = self.detection_graph.get_tensor_by_name(
+            'num_detections:0')
 
         # rospy.loginfo("WOLOLOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO Initialized")
 
@@ -62,7 +69,9 @@ class TLClassifier(object):
         # Actual detection.
         with self.detection_graph.as_default():
             (boxes, scores, classes, num) = self.session.run(
-                [self.detection_boxes, self.detection_scores, self.detection_classes, self.num_detections],
+                [self.detection_boxes, self.detection_scores,
+                 self.detection_classes,
+                 self.num_detections],
                 feed_dict={self.image_tensor: image_np_expanded})
 
         scores = np.squeeze(scores)
@@ -71,7 +80,10 @@ class TLClassifier(object):
         indice = np.argmax(scores)
 
         if scores[indice] >= 0.5:
-            rospy.loginfo("*TL State = " + str(classes[indice]) + " " + self.map_class_to_str[int(classes[indice])])
+            rospy.loginfo(
+                "*TL State = " + str(classes[indice]) + " " +
+                self.map_class_to_str[
+                    int(classes[indice])])
             return self.map_class_to_tl[int(classes[indice])]
 
         return TrafficLight.UNKNOWN
