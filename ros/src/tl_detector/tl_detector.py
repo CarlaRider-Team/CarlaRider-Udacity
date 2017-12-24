@@ -117,7 +117,7 @@ class TLDetector(object):
         if self.waypoints is not None:
             wps = self.waypoints.waypoints
             self.wps1 = wps
-        
+
         n = len(self.wps1)
         for i in range(n):
             wpsi = self.wps1[i].pose.pose.position
@@ -172,7 +172,7 @@ class TLDetector(object):
         light = None
         closest_light_wp = None
 
-        
+
         if (self.waypoints is None):
             return -1, TrafficLight.UNKNOWN
 
@@ -200,8 +200,8 @@ class TLDetector(object):
             light = self.lights[closest_light_ix]
 
         if light:
-            state = light.state                    # remove this line after classifier is implemented
-            # state = self.get_light_state(light)  # use    this line after classifier is implemented
+            # state = light.state                    # remove this line after classifier is implemented
+            state = self.get_light_state(light)  # use    this line after classifier is implemented
             out_string = "process_traffic_lights: closest_light_wp="+str(closest_light_wp)+" closest_light_ix="+str(closest_light_ix)+" closest_light_st="+str(state)
             rospy.loginfo(out_string)
             return closest_light_wp, state
