@@ -23,7 +23,7 @@ What we have done in this project:
 ### Traffic Light Detection
 
 We have used [Single Shot Detector Inception v2 model](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) that was pretrained with COCO dataset. And we have further trained it with the help of [TF Object Detection API](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/using_your_own_dataset.md) with udacity's simulator and real images given in the bag file.
-Detailed results are in: 
+Detailed results are in: [tl_detection.ipynb](https://github.com/CarlaRider-Team/CarlaRider-Udacity/blob/master/tl_detection.ipynb)
 
 ### Results 
 
