@@ -3,9 +3,11 @@ import numpy as np
 import tensorflow as tf
 import rospy
 
-
 # Modified code from tensorflow object detection repo
 # https://github.com/tensorflow/models/blob/master/research/object_detection/object_detection_tutorial.ipynb
+
+is_real = True
+
 
 class TLClassifier(object):
     def __init__(self):
@@ -28,9 +30,12 @@ class TLClassifier(object):
             od_graph_def = tf.GraphDef()
             import os
             path1 = (os.getcwd())
-            with tf.gfile.GFile(
-                            path1 + '/light_classification/trained_models/sim/frozen_inference_graph.pb',
-                    'rb') as fid:
+            if is_real:
+                path1 += '/light_classification/trained_models/real/frozen_inference_graph.pb'
+            else:
+                path1 += '/light_classification/trained_models/sim/frozen_inference_graph.pb'
+
+            with tf.gfile.GFile(path1, 'rb') as fid:
                 serialized_graph = fid.read()
                 od_graph_def.ParseFromString(serialized_graph)
                 tf.import_graph_def(od_graph_def, name='')
@@ -79,7 +84,7 @@ class TLClassifier(object):
         classes = np.squeeze(classes).astype(np.int32)
         indice = np.argmax(scores)
 
-        if scores[indice] >= 0.7:
+        if scores[indice] >= 0.5:
             rospy.loginfo(
                 "*TL State = " + str(classes[indice]) + " " +
                 self.map_class_to_str[
