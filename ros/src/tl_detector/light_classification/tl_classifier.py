@@ -79,7 +79,7 @@ class TLClassifier(object):
         classes = np.squeeze(classes).astype(np.int32)
         indice = np.argmax(scores)
 
-        if scores[indice] >= 0.5:
+        if scores[indice] >= 0.7:
             rospy.loginfo(
                 "*TL State = " + str(classes[indice]) + " " +
                 self.map_class_to_str[

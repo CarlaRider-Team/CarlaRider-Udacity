@@ -1,3 +1,38 @@
+## Udacity Self-Driving Car Nanodegree
+## Capstone Project
+
+### CarlaRider Team
+| Name                       | Email                    |
+|:---------------------------|:-------------------------|
+| M. Fatih Cırıt (Team Lead) | mfcirit@gmail.com        |
+| Kang Shin                  | kshin33@gmail.com        |
+| Pratik Thaker              | pratikthaker@gmail.com   |
+| Rudy Pena                  | rudypenajr@gmail.com     |
+| Andres Munoz               | munoznajar@gmail.com     |
+
+### Requirements
+What we have done in this project: 
+
+* Follow given waypoints in the simulator.
+* Detect and classify traffic lights.
+* Stop at red and go at green.
+* Publish brake, steering, throttle commands over ROS at 50 Hz.
+* When DBW is toggled, stop/restart controllers.
+* Don't exceed the given max speed.
+
+### Traffic Light Detection
+
+We have used [Single Shot Detector Inception v2 model](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/detection_model_zoo.md) that was pretrained with COCO dataset. And we have further trained it with the help of [TF Object Detection API](https://github.com/tensorflow/models/blob/master/research/object_detection/g3doc/using_your_own_dataset.md) with udacity's simulator and real images given in the bag file.
+Detailed results are in: 
+
+### Results 
+
+Car is able to perform all the requirements that were asked. Here is a vid from simulator:
+
+[![Simulator](http://img.youtube.com/vi/RTB42JcAkKk/0.jpg)](http://www.youtube.com/watch?v=RTB42JcAkKk "Simulator")
+
+---
+
 This is the project repo for the final project of the Udacity Self-Driving Car Nanodegree: Programming a Real Self-Driving Car. For more information about the project, see the project introduction [here](https://classroom.udacity.com/nanodegrees/nd013/parts/6047fe34-d93c-4f50-8336-b70ef10cb4b2/modules/e1a23b06-329a-4684-a717-ad476f0d8dff/lessons/462c933d-9f24-42d3-8bdc-a08a5fc866e4/concepts/5ab4b122-83e6-436d-850f-9f4d26627fd9).
 
 ### Native Installation
