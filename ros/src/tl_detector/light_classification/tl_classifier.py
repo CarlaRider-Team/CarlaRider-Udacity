@@ -6,11 +6,9 @@ import rospy
 # Modified code from tensorflow object detection repo
 # https://github.com/tensorflow/models/blob/master/research/object_detection/object_detection_tutorial.ipynb
 
-is_real = True
-
 
 class TLClassifier(object):
-    def __init__(self):
+    def __init__(self, is_real):
         self.map_class_to_tl = {
             1: TrafficLight.GREEN,
             2: TrafficLight.YELLOW,
