@@ -4,11 +4,11 @@
 ### CarlaRider Team
 | Name                       | Email                    |
 |:---------------------------|:-------------------------|
-| M. Fatih Cırıt (Team Lead) | mfcirit@gmail.com        |
-| Kang Shin                  | kshin33@gmail.com        |
-| Pratik Thaker              | pratikthaker@gmail.com   |
-| Rudy Pena                  | rudypenajr@gmail.com     |
-| Andres Munoz               | munoznajar@gmail.com     |
+| M. Fatih Cırıt (Team Lead) | x        |
+| Kang Shin                  | x      |
+| Pratik Thaker              | x   |
+| Rudy Pena                  | x     |
+| Andres Munoz               | x     |
 
 ### Requirements
 What we have done in this project: 
